@@ -11,7 +11,8 @@
                 <p class="description px-3">{{ product.description }}</p>
                 <TheRating :rating = "product.rating.rate"/>
                 <p class="px-3"><span class="price">Price:</span> {{ product.price}} RS</p>
-                <button class="btn btn-dark mx-3">ADD TO CART</button>
+                <button class="btn btn-dark mx-3" @click="addToCart">ADD TO CART</button>
+                
             </div>
         </div>
     </div>
@@ -33,10 +34,15 @@
 
 <script setup>
 import { ref, onMounted,defineProps,computed } from 'vue';
+import {useAddToCart} from '../store/addToCart.js'
 import { onBeforeRouteLeave } from 'vue-router';
 import TheRating from '../components/TheRating.vue'
 import TheNavVue from '@/components/TheNav.vue';
 import axios from 'axios'
+
+const cartStore = ref(useAddToCart())
+
+
 
 const props = defineProps({
   id:{
@@ -62,6 +68,17 @@ onMounted(()=>{
 const product = computed(()=>{
   return products.value.find(product =>product.id === props.id)
 })
+const addToCart =()=>{
+   if(product.value){
+   cartStore.value.addToCart({
+      id:product.value.id,
+      title:product.value.title,
+      image:product.value.image,
+      price:product.value.price
+   })
+}
+}
+
 
 onBeforeRouteLeave(()=>{
    const answer  = window.confirm('Do you really want to leave?')
